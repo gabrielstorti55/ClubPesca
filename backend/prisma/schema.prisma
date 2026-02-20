@@ -12,7 +12,7 @@ datasource db {
 }
 
 // ==============================
-// USER
+// USER ok
 // ==============================
 
 model User {
@@ -30,7 +30,7 @@ model User {
 }
 
 // ==============================
-// BUSINESS TYPE
+// BUSINESS TYPE ok
 // ==============================
 
 model BusinessType {
@@ -41,7 +41,7 @@ model BusinessType {
 }
 
 // ==============================
-// BUSINESS (Pesqueiro / Loja / Clube)
+// BUSINESS (Pesqueiro / Loja / Clube) ok
 // ==============================
 
 model Business {
@@ -78,7 +78,7 @@ model Business {
 }
 
 // ==============================
-// ADDRESS
+// ADDRESS ok
 // ==============================
 
 model Address {

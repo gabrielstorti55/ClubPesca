@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Header } from "@/components/header-2";
 import { PesqueiroCard } from "@/components/destaque-card";
-import { any } from "zod";
 
 const dicas = [
   {

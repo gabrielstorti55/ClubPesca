@@ -1,16 +1,20 @@
 "use client";
 import React from "react";
 import { ProfileFluidMenu } from "./profile-fluid-menu";
+import { Perfil } from "@/pages/profile";
 import { useAuth } from "@/context/auth-context";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { MenuToggleIcon } from "@/components/menu-toggle-icon";
 import { useScroll } from "@/components/use-scroll";
+import { useState } from "react";
+
 
 export function Header() {
   const [open, setOpen] = React.useState(false);
   const scrolled = useScroll(10);
   const { user, loading, logout } = useAuth();
+  const [showProfile, setShowProfile] = useState(false);
 
   const links = [
     {
@@ -81,10 +85,7 @@ export function Header() {
             </a>
           ))}
           {!loading && user ? (
-            <ProfileFluidMenu
-              user={user}
-              onLogout={logout}
-            />
+            <ProfileFluidMenu />
           ) : (
             <>
               <Button variant="outline" asChild>
@@ -95,6 +96,7 @@ export function Header() {
               </Button>
             </>
           )}
+          {showProfile && <Perfil onClose={() => setShowProfile(false)} />}
         </div>
         <Button
           size="icon"

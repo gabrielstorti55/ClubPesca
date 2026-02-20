@@ -2,6 +2,7 @@ import LoginPage from './pages/login';
 import SignupPage from './pages/cadastro';
 import { Routes, Route } from "react-router-dom";
 import HomePage from './pages/home';
+import { Perfil } from './pages/profile';
 import { AuthProvider } from './context/auth-context';
 
 export default function App() {
@@ -12,6 +13,7 @@ export default function App() {
           <Route path="/" element={<LoginPage />} />
           <Route path="/cadastro" element={<SignupPage />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/profile" element={<Perfil />} />
         </Routes>
       </div>
     </AuthProvider>
