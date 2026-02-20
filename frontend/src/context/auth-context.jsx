@@ -33,8 +33,14 @@ export function AuthProvider({ children }) {
       });
   }, []);
 
+  function logout() {
+    localStorage.removeItem("token");
+    setUser(null);
+    fetch("http://localhost:3000/auth/logout", { method: "POST" });
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );

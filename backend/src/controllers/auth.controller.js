@@ -1,4 +1,9 @@
 import { loginUser, registerUser, getUserById } from '../services/auth.service.js'
+// Logout apenas "invalida" o token no front, mas pode ser usado para limpar cookies se necessário
+export function logout(req, res) {
+  // Se usar cookies, limpar aqui: res.clearCookie('token');
+  return res.status(200).json({ message: 'Logout realizado com sucesso' });
+}
 
 export async function register(req, res) {
   try {

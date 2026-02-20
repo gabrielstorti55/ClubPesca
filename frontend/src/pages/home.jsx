@@ -40,9 +40,8 @@ export default function Home() {
             <section className="relative w-full h-[420px] flex items-center justify-center overflow-hidden">
                 <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80" alt="Banner de pescaria" className="absolute inset-0 w-full h-full object-cover scale-110 blur-sm brightness-75" />
                 <div className="relative z-10 text-center flex flex-col items-center">
-                    <h1 className="text-5xl md:text-6xl font-extrabold mb-4 text-white drop-shadow-lg">ClubPesca</h1>
+                    <h1 className="text-5xl md:text-6xl font-extrabold mb-4 text-white drop-shadow-lg">FisgaClub</h1>
                     <p className="text-2xl md:text-3xl text-white mb-6 drop-shadow">Descubra os melhores destinos de pesca esportiva</p>
-                    <button className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-full font-bold text-lg shadow-lg transition">Cadastre-se</button>
                 </div>
             </section>
 
@@ -76,7 +75,7 @@ export default function Home() {
             {/* Rodapé */}
             <footer className="bg-blue-900 text-white py-8 mt-auto w-full">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-4">
-                    <span className="text-lg">&copy; 2026 ClubPesca. Todos os direitos reservados.</span>
+                    <span className="text-lg">&copy; 2026 FisgaClub. Todos os direitos reservados.</span>
                     <div className="flex gap-6 mt-4 md:mt-0">
                         <a href="#" className="hover:underline text-white text-lg">Instagram</a>
                         <a href="#" className="hover:underline text-white text-lg">Facebook</a>
