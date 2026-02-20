@@ -1,5 +1,89 @@
-export default function HomePage(){
+import React from "react";
+import { Header } from "@/components/header-2";
+
+
+const destinos = [
+    {
+        nome: "Rio Amazonas",
+        descricao: "Aventure-se na maior diversidade de peixes do Brasil.",
+        imagem: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+        nome: "Pantanal",
+        descricao: "Pesque em um dos ecossistemas mais ricos do mundo.",
+        imagem: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+        nome: "Lago de Furnas",
+        descricao: "Ótimo para pesca de tilápia e tucunaré.",
+        imagem: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+    },
+];
+
+const dicas = [
+    {
+        titulo: "Como escolher a isca ideal?",
+        texto: "Veja dicas para aumentar suas chances de sucesso na pescaria.",
+    },
+    {
+        titulo: "Equipamentos recomendados",
+        texto: "Conheça os melhores equipamentos para cada tipo de peixe.",
+    },
+];
+
+export default function Home() {
     return (
-        <h1>ola</h1>
-    )
+        <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-blue-200 via-blue-100 to-blue-300">
+            <Header />
+
+            {/* Banner principal */}
+            <section className="relative w-full h-[420px] flex items-center justify-center overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80" alt="Banner de pescaria" className="absolute inset-0 w-full h-full object-cover scale-110 blur-sm brightness-75" />
+                <div className="relative z-10 text-center flex flex-col items-center">
+                    <h1 className="text-5xl md:text-6xl font-extrabold mb-4 text-white drop-shadow-lg">ClubPesca</h1>
+                    <p className="text-2xl md:text-3xl text-white mb-6 drop-shadow">Descubra os melhores destinos de pesca esportiva</p>
+                    <button className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-full font-bold text-lg shadow-lg transition">Cadastre-se</button>
+                </div>
+            </section>
+
+            {/* Destinos de pesca */}
+            <section className="py-12 px-4 max-w-7xl mx-auto w-full">
+                <h2 className="text-3xl font-bold text-blue-900 mb-8 text-center">Destinos em destaque</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                    {destinos.map((destino, idx) => (
+                        <div key={idx} className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-center hover:scale-105 transition-transform">
+                            <img src={destino.imagem} alt={destino.nome} className="w-full h-48 object-cover rounded-xl mb-4" />
+                            <h3 className="text-xl font-semibold mb-2 text-blue-800">{destino.nome}</h3>
+                            <p className="text-gray-600 text-base text-center">{destino.descricao}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Dicas e novidades */}
+            <section className="py-10 px-4 max-w-7xl mx-auto w-full">
+                <h2 className="text-2xl font-bold text-blue-900 mb-6 text-center">Dicas & Novidades</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {dicas.map((dica, idx) => (
+                        <div key={idx} className="bg-blue-100 rounded-xl p-6 shadow flex flex-col items-start hover:bg-blue-200 transition">
+                            <h4 className="font-semibold text-lg mb-2 text-blue-800">{dica.titulo}</h4>
+                            <p className="text-base text-gray-700">{dica.texto}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Rodapé */}
+            <footer className="bg-blue-900 text-white py-8 mt-auto w-full">
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-4">
+                    <span className="text-lg">&copy; 2026 ClubPesca. Todos os direitos reservados.</span>
+                    <div className="flex gap-6 mt-4 md:mt-0">
+                        <a href="#" className="hover:underline text-white text-lg">Instagram</a>
+                        <a href="#" className="hover:underline text-white text-lg">Facebook</a>
+                        <a href="#" className="hover:underline text-white text-lg">Contato</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
 }

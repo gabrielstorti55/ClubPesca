@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
@@ -41,25 +42,31 @@ export async function loginUser({email, password}) {
     const foundEmail = await prisma.user.findUnique({
         where: {email}
     })
-
     if(!foundEmail){
         throw Error("Credenciais invalidas")
     }
 
     const senhaOk= await bcrypt.compare(password, foundEmail.password)
-
     if(!senhaOk){
         throw Error("Credenciais invalidas")
     }
 
     const token = jwt.sign({id: foundEmail.id}, JWT_SECRET, {expiresIn: '1d'})
-
     return{
         id: foundEmail.id,
         name: foundEmail.name,
         email: foundEmail.email,
         token
     }
-
 }
 
+export async function getUserById(id) {
+    // Garante que o id seja tratado como ObjectId para o MongoDB
+    let userId = id;
+    try {
+        userId = new ObjectId(id);
+    } catch (e) {
+        // Se não for possível converter, mantém como string
+    }
+    return await prisma.user.findUnique({ where: { id: userId } });
+}

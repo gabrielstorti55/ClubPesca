@@ -1,4 +1,4 @@
-import { loginUser, registerUser } from '../services/auth.service.js'
+import { loginUser, registerUser, getUserById } from '../services/auth.service.js'
 
 export async function register(req, res) {
   try {
@@ -22,4 +22,18 @@ export async function login(req, res) {
     }catch(err){
         return res.status(400).json({error: err.message})
     }
+}
+
+export async function me(req, res) {
+  try {
+    const user = await getUserById(req.userId);
+    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao buscar usuário' });
+  }
 }

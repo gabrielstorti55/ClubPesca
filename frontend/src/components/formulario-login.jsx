@@ -50,7 +50,8 @@ export function LoginForm({ className, ...props }) {
 
       console.log("Login realizado:", data);
 
-      setTimeout(() => navigate("/home"), 2000);
+      navigate("/home");
+      window.location.reload();
     } catch (error) {
       alert("Erro ao conectar. Tente novamente.");
       console.error(error);
@@ -70,24 +71,24 @@ export function LoginForm({ className, ...props }) {
           <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
-                <Button variant="outline" type="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path
-                      d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
-                      fill="currentColor"
-                    />
-                  </svg>
-                  Entrar com Apple
-                </Button>
-                <Button variant="outline" type="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path
-                      d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                  Entrar com Google
-                </Button>
+                <div className="flex flex-col gap-2">
+                  <Button variant="outline" type="button" className="flex items-center justify-center gap-2 w-full">
+                    <span className="flex items-center justify-center w-5 h-5">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M16.365 1.43c0 1.14-.93 2.06-2.07 2.06-.02 0-.04 0-.06-.01-.17-1.09 1.01-2.06 2.07-2.05zm-1.76 2.82c1.14 0 1.62.77 3.03.77 1.41 0 1.85-.75 3.04-.75.97 0 1.99.56 2.72 1.52-2.39 1.31-1.98 4.7.47 5.56-.38 1.13-.98 2.23-1.75 3.13-.77.91-1.62 1.81-2.77 1.78-1.13-.03-1.48-.72-2.77-.72-1.29 0-1.6.7-2.77.73-1.15.03-2.06-.98-2.83-1.89-.77-.91-1.36-2.01-1.74-3.14 2.47-.86 2.87-4.25.47-5.56.73-.96 1.75-1.52 2.72-1.52z" fill="currentColor" />
+                      </svg>
+                    </span>
+                    Entrar com Apple
+                  </Button>
+                  <Button variant="outline" type="button" className="flex items-center justify-center gap-2 w-full">
+                    <span className="flex items-center justify-center w-5 h-5">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                        <g fill="none"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z" fill="#fff"/><path d="M21.805 12.276c0-.638-.057-1.25-.163-1.837H12v3.48h5.52a4.72 4.72 0 0 1-2.05 3.1v2.58h3.31c1.94-1.79 3.025-4.43 3.025-7.323Z" fill="#4285F4"/><path d="M12 22c2.7 0 4.97-.89 6.627-2.42l-3.31-2.58c-.92.62-2.09.99-3.317.99-2.55 0-4.71-1.72-5.48-4.04H3.1v2.54A9.997 9.997 0 0 0 12 22Z" fill="#34A853"/><path d="M6.52 13.95A5.99 5.99 0 0 1 6.13 12c0-.68.12-1.34.33-1.95V7.51H3.1A9.997 9.997 0 0 0 2 12c0 1.64.39 3.19 1.1 4.54l3.42-2.59Z" fill="#FBBC05"/><path d="M12 6.88c1.47 0 2.78.51 3.81 1.51l2.85-2.85C17.03 3.89 14.73 3 12 3A9.997 9.997 0 0 0 3.1 7.51l3.42 2.54C7.29 8.6 9.45 6.88 12 6.88Z" fill="#EA4335"/></g>
+                      </svg>
+                    </span>
+                    Entrar com Google
+                  </Button>
+                </div>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Ou continue com
