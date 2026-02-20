@@ -8,7 +8,11 @@ export async function createBusiness(data) {
 }
 
 export async function getAllBusinesses() {
-  return await prisma.business.findMany()
+  return await prisma.business.findMany({
+    include: {
+      address: true
+    }
+  })
 }
 
 export async function getBusinessesById(id) {

@@ -1,11 +1,10 @@
-import { createBusiness } from "../services/business.service.js"
+import { createBusiness, getAllBusinesses } from "../services/business.service.js"
 
 export async function create(req, res) {
   try {
-    // Vincula o business ao usuário logado
     const data = {
       ...req.body,
-      ownerId: req.userId // userId vem do authenticateToken
+      ownerId: req.userId 
     };
     const business = await createBusiness(data);
     return res.status(201).json(business);
@@ -13,5 +12,14 @@ export async function create(req, res) {
     return res.status(400).json({
       error: err.message
     });
+  }
+}
+
+export async function getAll(req, res) {
+  try {
+    const businesses = await getAllBusinesses();
+    return res.json(businesses);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 }
