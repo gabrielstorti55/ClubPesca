@@ -1,14 +1,19 @@
 import express from 'express'
 import authRoutes from './routes/auth.routes.js'
+import businessRoutes from './routes/business.routes.js'
+import addressRoutes from './routes/address.routes.js'
+import businessTypeRoutes from './routes/businessType.routes.js'
 import 'dotenv/config'
 import cors from 'cors'
-
 
 const app = express()
 
 app.use(cors());
 app.use(express.json())
 app.use('/auth', authRoutes)
+app.use('/business', businessRoutes)
+app.use('/address', addressRoutes)
+app.use('/businessType', businessTypeRoutes)
 
 app.listen(3000, () => {
   console.log('Servidor rodando')

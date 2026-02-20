@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// ==============================
+// GENERATOR & DATABASE
+// ==============================
 
 generator client {
   provider = "prisma-client-js"
@@ -13,22 +11,179 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ==============================
+// USER
+// ==============================
+
 model User {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   name      String
-  password String
+  password  String
 
-  addressId String?  @db.ObjectId
-  address   Address? @relation(fields: [addressId], references: [id])
+  businesses Business[] @relation("UserBusinesses")
+  reviews    Review[]
+  addresses  Address[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Address {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  city    String
-  street  String
-  number  Int
-  zipCode String
+// ==============================
+// BUSINESS TYPE
+// ==============================
 
-  users   User[]
+model BusinessType {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique // pesqueiro, loja, clube, aluguel, etc
+
+  businesses Business[] @relation("BusinessTypeBusinesses")
+}
+
+// ==============================
+// BUSINESS (Pesqueiro / Loja / Clube)
+// ==============================
+
+model Business {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  phone       String?
+  whatsapp    String?
+  website     String?
+  latitude    Float?
+  longitude   Float?
+
+  // Owner
+  ownerId     String   @db.ObjectId
+  owner       User     @relation("UserBusinesses", fields: [ownerId], references: [id])
+
+  // Type
+  typeId      String   @db.ObjectId
+  type        BusinessType @relation("BusinessTypeBusinesses", fields: [typeId], references: [id])
+
+  // Address
+  addressId   String   @db.ObjectId
+  address     Address  @relation(fields: [addressId], references: [id])
+
+  // Relations
+  fishes      BusinessFish[]
+  offers      Offer[]
+  photos      Photo[]
+  reviews     Review[]
+
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ==============================
+// ADDRESS
+// ==============================
+
+model Address {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  city      String
+  state     String
+  street    String
+  number    Int
+  zipCode   String
+  latitude  Float?
+  longitude Float?
+
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+
+  businesses Business[]
+}
+
+// ==============================
+// FISH
+// ==============================
+
+model Fish {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String
+  type String? // doce, salgada, híbrida
+
+  businesses BusinessFish[]
+}
+
+// ==============================
+// BUSINESS ↔ FISH (Junction Table)
+// ==============================
+
+model BusinessFish {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  businessId String   @db.ObjectId
+  business   Business @relation(fields: [businessId], references: [id])
+
+  fishId String @db.ObjectId
+  fish   Fish   @relation(fields: [fishId], references: [id])
+
+  // Futuro: quantidade, data, etc
+  createdAt DateTime @default(now())
+}
+
+// ==============================
+// OFFER (Produto / Serviço / Aluguel)
+// ==============================
+
+model Offer {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name        String
+  description String?
+
+  price       Float
+
+  // entrada | aluguel | produto | servico
+  type        String
+
+  businessId  String   @db.ObjectId
+  business    Business @relation(fields: [businessId], references: [id])
+
+  active      Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ==============================
+// PHOTO
+// ==============================
+
+model Photo {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+
+  url        String
+
+  isMain     Boolean @default(false)
+  order      Int?
+
+  businessId String   @db.ObjectId
+  business   Business @relation(fields: [businessId], references: [id])
+
+  createdAt  DateTime @default(now())
+}
+
+// ==============================
+// REVIEW
+// ==============================
+
+model Review {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  rating  Int
+  comment String?
+
+  userId  String @db.ObjectId
+  user    User   @relation(fields: [userId], references: [id])
+
+  businessId String   @db.ObjectId
+  business   Business @relation(fields: [businessId], references: [id])
+
+  createdAt DateTime @default(now())
 }
