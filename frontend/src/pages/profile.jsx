@@ -4,20 +4,9 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
-import { jwt } from "zod";
 
 export function Perfil() {
   const [profile, setProfile] = useState("");
-
-  const user = {
-    nome: "João da Silva",
-    email: "joao@email.com",
-    tipo: "Pescador",
-    cidade: "Florianópolis",
-    estado: "SC",
-    avatar:
-      "https://ui-avatars.com/api/?name=Joao+da+Silva&background=0D8ABC&color=fff",
-  };
 
   useEffect(() => {
     const BuscarPerfil = async () => {
