@@ -68,7 +68,7 @@ export default function BusinessPhotosManager({ businessId }) {
           {photos.length > 0 && photos[0].url ? (
             <>
               <img
-                src={photos[0].url.startsWith('/uploads') ? `http://localhost:3000${photos[0].url}` : photos[0].url}
+                src={photos[0].url.startsWith('data:') ? photos[0].url : `http://localhost:3000${photos[0].url}`}
                 alt="Logo do Pesqueiro"
                 className="w-full h-full object-cover rounded-2xl"
                 style={{ boxShadow: '0 0 0 4px #2563eb33' }}

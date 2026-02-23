@@ -15,7 +15,9 @@ export function PesqueiroCard({ pesqueiro }) {
       <img
         src={
           pesqueiro.photos && pesqueiro.photos.length > 0
-            ? `http://localhost:3000${pesqueiro.photos.find(p => p.isMain)?.url || pesqueiro.photos[0].url}`
+            ? (pesqueiro.photos[0].url.startsWith('data:')
+                ? pesqueiro.photos[0].url
+                : `http://localhost:3000${pesqueiro.photos[0].url}`)
             : "https://avatar.vercel.sh/shadcn1"
         }
         alt="Foto do pesqueiro"

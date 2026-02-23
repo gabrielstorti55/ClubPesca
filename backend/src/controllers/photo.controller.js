@@ -2,13 +2,13 @@ import { uploadPhoto, listPhotos, deletePhoto } from "../services/photo.service.
 
 export async function createPhoto(req, res) {
     try {
-        const { businessId, isMain, order } = req.body;
+        const { businessId } = req.body;
         let url = req.body.url;
         if (req.file) {
-            // Salva o caminho relativo da imagem
-            url = `/uploads/photos/${req.file.filename}`;
+            // Usa o buffer do multer em memória
+            url = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
         }
-        const photo = await uploadPhoto({ url, businessId, isMain, order });
+        const photo = await uploadPhoto({ url, businessId });
         res.status(201).json(photo);
     } catch (error) {
         res.status(500).json({ error: "Erro ao criar foto", details: error.message });
