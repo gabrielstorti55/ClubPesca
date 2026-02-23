@@ -22,21 +22,21 @@ function TabButton({ active, onClick, children }) {
 export function ProfileTabs() {
   const { user } = useAuth();
   const [tab, setTab] = useState("perfil");
-  const [business, setBusiness] = useState(null);
+  const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchBusiness() {
+    async function fetchBusinesses() {
       if (!user) return;
       setLoading(true);
       const res = await fetch(`http://localhost:3000/business/getAll`);
       const all = await res.json();
-      // Busca o business do usuário logado
-      const found = all.find(b => b.ownerId === user.id);
-      setBusiness(found || null);
+      // Busca todos os pesqueiros do usuário logado
+      const filtered = all.filter(b => b.ownerId === user.id);
+      setBusinesses(filtered);
       setLoading(false);
     }
-    fetchBusiness();
+    fetchBusinesses();
   }, [user]);
 
   return (
@@ -45,8 +45,8 @@ export function ProfileTabs() {
         <Card className="w-full max-w-2xl p-8 shadow-xl bg-white/80 rounded-xl flex flex-col items-center">
           <div className="flex w-full mb-6">
             <TabButton active={tab === "perfil"} onClick={() => setTab("perfil")}>Meu Perfil</TabButton>
-            {business && (
-              <TabButton active={tab === "pesqueiro"} onClick={() => setTab("pesqueiro")}>Meu Pesqueiro</TabButton>
+            {businesses.length > 0 && (
+              <TabButton active={tab === "pesqueiro"} onClick={() => setTab("pesqueiro")}>Meus Pesqueiros</TabButton>
             )}
           </div>
           <Separator className="mb-6 w-full" />
@@ -62,20 +62,25 @@ export function ProfileTabs() {
               <Button className="w-full" variant="secondary">Editar Perfil</Button>
             </div>
           )}
-          {tab === "pesqueiro" && business && (
+          {tab === "pesqueiro" && businesses.length > 0 && (
             <div className="flex flex-col items-center w-full">
-              <h2 className="text-xl font-bold text-blue-900 mb-2">{business.name}</h2>
-              <p className="text-blue-700 text-sm mb-2">{business.description}</p>
-              <p className="text-blue-700 text-sm mb-2">Telefone: {business.phone || "-"}</p>
-              <p className="text-blue-700 text-sm mb-2">Endereço: {business.address?.street}, {business.address?.number} - {business.address?.city}/{business.address?.state}</p>
-              <div className="w-full mt-4 mb-2">
-                <BusinessEditForm business={business} onSave={() => window.location.reload()} />
-              </div>
-              <BusinessPhotosManager businessId={business.id} />
+              {businesses.map(business => (
+                <div key={business.id} className="mb-8 w-full">
+                  <h2 className="text-xl font-bold text-blue-900 mb-2">{business.name}</h2>
+                  <p className="text-blue-700 text-sm mb-2">{business.description}</p>
+                  <p className="text-blue-700 text-sm mb-2">Telefone: {business.phone || "-"}</p>
+                  <p className="text-blue-700 text-sm mb-2">Endereço: {business.address?.street}, {business.address?.number} - {business.address?.city}/{business.address?.state}</p>
+                  <div className="w-full mt-4 mb-2">
+                    <BusinessEditForm business={business} onSave={() => window.location.reload()} />
+                  </div>
+                  <BusinessPhotosManager businessId={business.id} />
+                  <Separator className="my-6 w-full" />
+                </div>
+              ))}
             </div>
           )}
-          {tab === "pesqueiro" && !business && !loading && (
-            <div className="text-blue-800">Você ainda não possui um pesqueiro cadastrado.</div>
+          {tab === "pesqueiro" && businesses.length === 0 && !loading && (
+            <div className="text-blue-800">Você ainda não possui pesqueiros cadastrados.</div>
           )}
         </Card>
       </div>

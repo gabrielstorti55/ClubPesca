@@ -7,12 +7,24 @@ export async function createBusiness(data) {
   });
 }
 
+
 export async function getAllBusinesses() {
   return await prisma.business.findMany({
     include: {
-      address: true
+      address: true,
+      photos: true
     }
-  })
+  });
+}
+
+export async function getBusinessesByUserId(userId) {
+  return await prisma.business.findMany({
+    where: { ownerId: userId },
+    include: {
+      address: true,
+      photos: true
+    }
+  });
 }
 
 export async function getBusinessesById(id) {

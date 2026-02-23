@@ -5,7 +5,8 @@ import { Separator } from "@/components/ui/separator";
 
 export default function BusinessPhotosManager({ businessId }) {
   const [photos, setPhotos] = useState([]);
-  const [url, setUrl] = useState("");
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -16,15 +17,20 @@ export default function BusinessPhotosManager({ businessId }) {
   }, [businessId]);
 
   async function handleUpload() {
+    if (!file) return;
     setLoading(true);
     const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("photo", file);
+    formData.append("businessId", businessId);
     const res = await fetch("http://localhost:3000/photo/photos", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ url, businessId })
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData
     });
     if (res.ok) {
-      setUrl("");
+      setFile(null);
+      setPreview("");
       const novaFoto = await res.json();
       setPhotos(p => [...p, novaFoto]);
     }
@@ -56,32 +62,43 @@ export default function BusinessPhotosManager({ businessId }) {
 
   return (
     <div className="w-full mt-6">
-      <h3 className="text-lg font-semibold mb-2">Fotos do Pesqueiro</h3>
-      <div className="flex gap-2 mb-4">
+      <h3 className="text-lg font-semibold mb-4">Fotos do Pesqueiro</h3>
+      <div className="flex flex-col md:flex-row gap-4 mb-6 items-center">
         <input
-          type="text"
-          placeholder="URL da foto"
-          value={url}
-          onChange={e => setUrl(e.target.value)}
-          className="flex-1 border rounded px-2 py-1"
+          type="file"
+          accept="image/*"
+          onChange={e => {
+            const f = e.target.files[0];
+            setFile(f);
+            setPreview(f ? URL.createObjectURL(f) : "");
+          }}
+          className="flex-1 border-2 border-blue-300 rounded-lg px-3 py-2 shadow focus:border-blue-500 transition"
         />
-        <Button onClick={handleUpload} disabled={loading || !url}>
+        {preview && (
+          <img src={preview} alt="Preview" className="w-16 h-16 object-cover rounded-lg border border-blue-200" />
+        )}
+        <Button onClick={handleUpload} disabled={loading || !file} className="px-6 py-2 rounded-lg font-semibold bg-blue-600 text-white hover:bg-blue-700 transition">
           Adicionar
         </Button>
       </div>
-      <Separator className="my-4" />
-      <div className="grid grid-cols-2 gap-4">
+      <Separator className="my-6" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {photos.map(photo => (
-          <div key={photo.id} className="relative border rounded p-2 flex flex-col items-center">
-            <img src={photo.url} alt="Foto" className="w-32 h-32 object-cover rounded mb-2" />
+          <div key={photo.id} className={`relative border-2 rounded-xl p-4 flex flex-col items-center shadow-lg bg-white ${photo.isMain ? 'border-blue-600' : 'border-gray-200'}`}>
+            <img
+              src={photo.url.startsWith('/uploads') ? `http://localhost:3000${photo.url}` : photo.url}
+              alt="Foto"
+              className="w-44 h-44 object-cover rounded-xl mb-3 border-2 border-blue-200 bg-gray-100"
+              style={{ boxShadow: photo.isMain ? '0 0 0 4px #2563eb' : undefined }}
+            />
             {photo.isMain && (
-              <span className="text-xs text-blue-700 font-bold mb-1">Principal</span>
+              <span className="absolute top-2 left-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">Principal</span>
             )}
-            <div className="flex gap-2">
-              <Button size="sm" variant="secondary" onClick={() => handleSetMain(photo.id)} disabled={photo.isMain || loading}>
+            <div className="flex gap-3 mt-2 w-full justify-center">
+              <Button size="sm" variant="secondary" onClick={() => handleSetMain(photo.id)} disabled={photo.isMain || loading} className="rounded-lg">
                 Definir Principal
               </Button>
-              <Button size="sm" variant="destructive" onClick={() => handleDelete(photo.id)} disabled={loading}>
+              <Button size="sm" variant="destructive" onClick={() => handleDelete(photo.id)} disabled={loading} className="rounded-lg">
                 Deletar
               </Button>
             </div>

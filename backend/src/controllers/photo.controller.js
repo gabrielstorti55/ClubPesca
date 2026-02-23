@@ -1,9 +1,13 @@
 import { uploadPhoto, listPhotos, setMainPhoto, deletePhoto } from "../services/photo.service.js";
 
-// Cria uma nova foto para o pesqueiro
 export async function createPhoto(req, res) {
     try {
-        const { url, businessId, isMain, order } = req.body;
+        const { businessId, isMain, order } = req.body;
+        let url = req.body.url;
+        if (req.file) {
+            // Salva o caminho relativo da imagem
+            url = `/uploads/photos/${req.file.filename}`;
+        }
         const photo = await uploadPhoto({ url, businessId, isMain, order });
         res.status(201).json(photo);
     } catch (error) {

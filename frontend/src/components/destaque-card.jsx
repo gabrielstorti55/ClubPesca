@@ -13,9 +13,13 @@ export function PesqueiroCard({ pesqueiro }) {
     <Card className="relative mx-4 mt-9 w-full max-w-sm pt-0 rounded-2xl border bg-card">
       <div className="absolute inset-0 z-30 aspect-video bg-black/35 rounded-t-2xl" />
       <img
-        src="https://avatar.vercel.sh/shadcn1"
-        alt="Event cover"
-        className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40 rounded-t-2xl"
+        src={
+          pesqueiro.photos && pesqueiro.photos.length > 0
+            ? `http://localhost:3000${pesqueiro.photos.find(p => p.isMain)?.url || pesqueiro.photos[0].url}`
+            : "https://avatar.vercel.sh/shadcn1"
+        }
+        alt="Foto do pesqueiro"
+        className="relative z-20 aspect-video w-full object-cover rounded-t-2xl"
       />
       <CardHeader>
         <Badge variant="secondary">
