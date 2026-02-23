@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPhoto, getPhotos, makeMainPhoto, removePhoto } from "../controllers/photo.controller.js";
+import { createPhoto, getPhotos, removePhoto } from "../controllers/photo.controller.js";
 import upload from "../middleware/upload.middleware.js";
 
 const router = Router();
@@ -11,7 +11,7 @@ router.post("/photos", upload.single("photo"), createPhoto);
 router.get("/photos/:businessId", getPhotos);
 
 // Definir foto principal
-router.patch("/photos/main", makeMainPhoto);
+// Rota de foto principal removida
 
 // Deletar foto
 router.delete("/photos/:photoId", removePhoto);

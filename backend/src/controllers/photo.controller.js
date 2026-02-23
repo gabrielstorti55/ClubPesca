@@ -1,4 +1,4 @@
-import { uploadPhoto, listPhotos, setMainPhoto, deletePhoto } from "../services/photo.service.js";
+import { uploadPhoto, listPhotos, deletePhoto } from "../services/photo.service.js";
 
 export async function createPhoto(req, res) {
     try {
@@ -26,16 +26,7 @@ export async function getPhotos(req, res) {
     }
 }
 
-// Define uma foto como principal
-export async function makeMainPhoto(req, res) {
-    try {
-        const { photoId, businessId } = req.body;
-        const photo = await setMainPhoto(photoId, businessId);
-        res.json(photo);
-    } catch (error) {
-        res.status(500).json({ error: "Erro ao definir foto principal", details: error.message });
-    }
-}
+// Função de foto principal removida pois não é mais necessária
 
 // Deleta uma foto
 export async function removePhoto(req, res) {

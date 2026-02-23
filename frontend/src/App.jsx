@@ -2,7 +2,7 @@ import LoginPage from './pages/login';
 import SignupPage from './pages/cadastro';
 import { Routes, Route } from "react-router-dom";
 import HomePage from './pages/home';
-import { ProfileTabs } from './pages/profile-tabs';
+import { ProfileTabs } from './pages/profile';
 import { AuthProvider } from './context/auth-context';
 
 export default function App() {

@@ -3,19 +3,13 @@ import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
 
 // Cria uma nova foto para o pesqueiro
-export async function uploadPhoto({ url, businessId, isMain = false, order = null }) {
-	if (isMain) {
-		await prisma.photo.updateMany({
-			where: { businessId },
-			data: { isMain: false }
-		});
-	}
+export async function uploadPhoto({ url, businessId }) {
+	// Remove todas as fotos anteriores desse pesqueiro
+	await prisma.photo.deleteMany({ where: { businessId } });
 	return prisma.photo.create({
 		data: {
 			url,
-			businessId,
-			isMain,
-			order
+			businessId
 		}
 	});
 }
@@ -24,21 +18,12 @@ export async function uploadPhoto({ url, businessId, isMain = false, order = nul
 export async function listPhotos(businessId) {
 	return prisma.photo.findMany({
 		where: { businessId },
-		orderBy: [{ isMain: 'desc' }, { order: 'asc' }]
+		orderBy: { createdAt: 'desc' }
 	});
 }
 
 // Define uma foto como principal
-export async function setMainPhoto(photoId, businessId) {
-	await prisma.photo.updateMany({
-		where: { businessId },
-		data: { isMain: false }
-	});
-	return prisma.photo.update({
-		where: { id: photoId },
-		data: { isMain: true }
-	});
-}
+// Não é mais necessário setar foto principal
 
 // Deleta uma foto
 export async function deletePhoto(photoId) {
