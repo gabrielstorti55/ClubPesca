@@ -1,5 +1,6 @@
 ﻿/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from "react";
+import { apiUrl } from "@/lib/api";
 
 const AuthContext = createContext();
 
@@ -18,7 +19,7 @@ export function AuthProvider({ children }) {
 
     let active = true;
 
-    fetch("http://localhost:3000/auth/me", {
+    fetch(apiUrl("/auth/me"), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -48,7 +49,7 @@ export function AuthProvider({ children }) {
   function logout() {
     localStorage.removeItem("token");
     setUser(null);
-    fetch("http://localhost:3000/auth/logout", { method: "POST" });
+    fetch(apiUrl("/auth/logout"), { method: "POST" });
   }
 
   return (

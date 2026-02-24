@@ -1,88 +1,132 @@
-  import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { apiUrl, assetUrl } from "@/lib/api";
+
+function getLatestPhoto(photos) {
+  if (!Array.isArray(photos) || photos.length === 0) {
+    return null;
+  }
+
+  if (photos.length === 1) {
+    return photos[0];
+  }
+
+  const ordered = [...photos].sort((a, b) => {
+    if (a.createdAt && b.createdAt) {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }
+
+    return (b.id || 0) - (a.id || 0);
+  });
+
+  return ordered[0] || null;
+}
 
 export default function BusinessPhotosManager({ businessId }) {
-  // Debug: mostrar fotos carregadas
   const [photos, setPhotos] = useState([]);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const selectedPhoto = useMemo(() => photos[0] || null, [photos]);
+
   useEffect(() => {
     if (!businessId) return;
-    fetch(`http://localhost:3000/photo/photos/${businessId}`)
-      .then(res => res.json())
-      .then(fotos => {
-        // Ordena por createdAt ou id decrescente para garantir que a última seja exibida
-        let ordered = fotos;
-        if (Array.isArray(fotos) && fotos.length > 1) {
-          if (fotos[0].createdAt) {
-            ordered = fotos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-          } else if (fotos[0].id) {
-            ordered = fotos.sort((a, b) => b.id - a.id);
-          }
-        }
-        setPhotos(ordered && ordered.length ? [ordered[0]] : []);
+
+    fetch(apiUrl(`/photo/photos/${businessId}`))
+      .then((res) => res.json())
+      .then((fotos) => {
+        const latestPhoto = getLatestPhoto(fotos);
+        setPhotos(latestPhoto ? [latestPhoto] : []);
       });
   }, [businessId]);
 
   async function handleUpload() {
     if (!file) return;
+
     setLoading(true);
     const token = localStorage.getItem("token");
     const formData = new FormData();
     formData.append("photo", file);
     formData.append("businessId", businessId);
-    const res = await fetch("http://localhost:3000/photo/photos", {
+
+    const res = await fetch(apiUrl("/photo/photos"), {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
-      body: formData
+      body: formData,
     });
+
     if (res.ok) {
+      const novaFoto = await res.json();
       setFile(null);
       setPreview("");
-      const novaFoto = await res.json();
-      setPhotos([novaFoto]); // Sempre substitui a foto
+      setPhotos([novaFoto]);
     }
+
     setLoading(false);
   }
 
-  // Não precisa mais de set main ou delete
+  function handleClearImage() {
+    setFile(null);
+    setPreview("");
+    setPhotos([]);
+  }
 
   return (
     <div className="w-full mt-8">
       <h3 className="text-2xl font-bold mb-6 text-blue-900 tracking-tight flex items-center gap-2">
-        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a1 1 0 001 1h16a1 1 0 001-1V7M16 3v4M8 3v4m-5 4h18" /></svg>
+        <svg
+          className="w-6 h-6 text-blue-600"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3 7v10a1 1 0 001 1h16a1 1 0 001-1V7M16 3v4M8 3v4m-5 4h18"
+          />
+        </svg>
         Fotos do Pesqueiro
       </h3>
-      {/* Seção de adicionar nova foto removida */}
+
       <Separator className="my-8" />
+
       {loading && (
         <div className="text-blue-700 text-lg py-8 text-center">Carregando fotos...</div>
       )}
+
       <div className="flex justify-center">
         <div className="relative w-48 h-48 flex items-center justify-center border-2 border-blue-200 rounded-2xl bg-white/80 shadow-xl backdrop-blur-xl transition-all duration-200">
-          {photos.length > 0 && photos[0].url ? (
+          {selectedPhoto?.url ? (
             <>
               <img
-                src={photos[0].url.startsWith('data:') ? photos[0].url : `http://localhost:3000${photos[0].url}`}
+                src={assetUrl(selectedPhoto.url)}
                 alt="Logo do Pesqueiro"
                 className="w-full h-full object-cover rounded-2xl"
-                style={{ boxShadow: '0 0 0 4px #2563eb33' }}
+                style={{ boxShadow: "0 0 0 4px #2563eb33" }}
               />
               <button
                 type="button"
-                onClick={() => {
-                  setFile(null);
-                  setPreview("");
-                  setPhotos([]);
-                }}
+                onClick={handleClearImage}
                 className="absolute top-2 right-2 bg-white/80 hover:bg-blue-600 hover:text-white text-blue-600 rounded-full p-1 shadow transition z-10 border border-blue-100"
                 title="Alterar logo"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 11l6 6M3 17v4h4l11-11a2.828 2.828 0 10-4-4L3 17z" /></svg>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.232 5.232l3.536 3.536M9 11l6 6M3 17v4h4l11-11a2.828 2.828 0 10-4-4L3 17z"
+                  />
+                </svg>
               </button>
             </>
           ) : preview ? (
@@ -94,11 +138,26 @@ export default function BusinessPhotosManager({ businessId }) {
               />
               <button
                 type="button"
-                onClick={() => { setFile(null); setPreview(""); }}
+                onClick={() => {
+                  setFile(null);
+                  setPreview("");
+                }}
                 className="absolute top-2 right-2 bg-white/80 hover:bg-red-500 hover:text-white text-red-500 rounded-full p-1 shadow transition z-10 border border-red-100"
                 title="Remover preview"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
               </button>
               <Button
                 type="button"
@@ -107,7 +166,15 @@ export default function BusinessPhotosManager({ businessId }) {
                 className="absolute bottom-4 left-1/2 -translate-x-1/2 w-24 rounded-xl font-semibold bg-blue-600 text-white hover:bg-blue-700 transition shadow-lg z-10"
               >
                 <span className="flex items-center gap-2 justify-center">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
                   Salvar
                 </span>
               </Button>
@@ -117,14 +184,22 @@ export default function BusinessPhotosManager({ businessId }) {
               <input
                 type="file"
                 accept="image/*"
-                onChange={e => {
-                  const f = e.target.files[0];
-                  setFile(f);
-                  setPreview(f ? URL.createObjectURL(f) : "");
+                onChange={(e) => {
+                  const selectedFile = e.target.files[0];
+                  setFile(selectedFile);
+                  setPreview(selectedFile ? URL.createObjectURL(selectedFile) : "");
                 }}
                 className="hidden"
               />
-              <svg className="w-12 h-12 text-blue-300 group-hover:text-blue-500 mb-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+              <svg
+                className="w-12 h-12 text-blue-300 group-hover:text-blue-500 mb-2"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
               <span className="text-blue-400 text-sm">Adicionar logo</span>
             </label>
           )}

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { apiUrl } from "@/lib/api";
 
 export function LoginForm({ className, ...props }) {
   const [email, setEmail] = useState("");
@@ -30,7 +31,7 @@ export function LoginForm({ className, ...props }) {
       return;
     }
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch(apiUrl("/auth/login"), {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({ email, password: senha }),

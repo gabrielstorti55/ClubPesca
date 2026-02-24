@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiUrl } from "@/lib/api";
 
 export function SignupForm({ className, ...props }) {
   const [nome, setNome] = useState("");
@@ -31,7 +32,7 @@ export function SignupForm({ className, ...props }) {
       return;
     }
     try {
-      const response = await fetch("http://localhost:3000/auth/cadastro", {
+      const response = await fetch(apiUrl("/auth/cadastro"), {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({ name: nome, email, password: senha }),
@@ -58,7 +59,7 @@ export function SignupForm({ className, ...props }) {
     >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Crie sua conta</h1>
+          <h1 className="font-display text-2xl font-bold">Crie sua conta</h1>
           <p className="text-muted-foreground text-sm text-balance">
             Preencha o formulário abaixo para criar sua conta
           </p>

@@ -1,75 +1,81 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { apiUrl } from "@/lib/api";
+
+const DAYS_OF_WEEK = [
+  { label: "Dom", value: "domingo" },
+  { label: "Seg", value: "segunda" },
+  { label: "Ter", value: "terca" },
+  { label: "Qua", value: "quarta" },
+  { label: "Qui", value: "quinta" },
+  { label: "Sex", value: "sexta" },
+  { label: "Sab", value: "sabado" },
+];
+
+function normalizeDay(day) {
+  return (day || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z]/g, "");
+}
 
 export default function BusinessEditForm({ business, onSave }) {
-  const [form, setForm] = useState({
-    name: business.name || "",
-    description: business.description || "",
-    phone: business.phone || "",
-    website: business.website || "",
-    openingTime: business.openingTime || "",
-    closingTime: business.closingTime || "",
-    openDays: business.openDays || [], // array de strings: ['segunda', 'terça', ...]
-  });
+  const initialForm = useMemo(
+    () => ({
+      name: business.name || "",
+      description: business.description || "",
+      phone: business.phone || "",
+      website: business.website || "",
+      openingTime: business.openingTime || "",
+      closingTime: business.closingTime || "",
+      openDays: business.openDays || [],
+    }),
+    [business]
+  );
 
-  const diasSemana = [
-    { label: 'Dom', value: 'domingo' },
-    { label: 'Seg', value: 'segunda' },
-    { label: 'Ter', value: 'terca' },
-    { label: 'Qua', value: 'quarta' },
-    { label: 'Qui', value: 'quinta' },
-    { label: 'Sex', value: 'sexta' },
-    { label: 'Sáb', value: 'sabado' },
-  ];
+  const [form, setForm] = useState(initialForm);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
 
   function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
   function handleDayToggle(day) {
-    setForm(f => ({
-      ...f,
-      openDays: f.openDays.includes(day)
-        ? f.openDays.filter(d => d !== day)
-        : [...f.openDays, day]
+    setForm((prev) => ({
+      ...prev,
+      openDays: prev.openDays.includes(day)
+        ? prev.openDays.filter((currentDay) => currentDay !== day)
+        : [...prev.openDays, day],
     }));
-  }
-
-  function normalizaDia(dia) {
-    return dia
-      .toLowerCase()
-      .replace('á', 'a').replace('ã', 'a').replace('â', 'a')
-      .replace('é', 'e').replace('ê', 'e')
-      .replace('í', 'i')
-      .replace('ó', 'o').replace('ô', 'o')
-      .replace('ú', 'u')
-      .replace('ç', 'c');
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setSaving(true);
     setSuccess(false);
+
     const token = localStorage.getItem("token");
-    // Normaliza os dias antes de enviar
     const formToSend = {
       ...form,
-      openDays: (form.openDays || []).map(normalizaDia)
+      openDays: (form.openDays || []).map(normalizeDay),
     };
-    const res = await fetch(`http://localhost:3000/business/${business.id}`, {
+
+    const response = await fetch(apiUrl(`/business/${business.id}`), {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(formToSend)
+      body: JSON.stringify(formToSend),
     });
+
     setSaving(false);
-    if (res.ok) {
+
+    if (response.ok) {
       setSuccess(true);
       if (onSave) onSave();
     }
@@ -81,46 +87,74 @@ export default function BusinessEditForm({ business, onSave }) {
         <label className="block text-sm font-medium mb-1">Nome do Pesqueiro</label>
         <Input name="name" value={form.name} onChange={handleChange} required />
       </div>
+
       <div>
-        <label className="block text-sm font-medium mb-1">Descrição</label>
-        <Input name="description" value={form.description} onChange={handleChange} required />
+        <label className="block text-sm font-medium mb-1">Descricao</label>
+        <Input
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          required
+        />
       </div>
+
       <div>
         <label className="block text-sm font-medium mb-1">Telefone</label>
         <Input name="phone" value={form.phone} onChange={handleChange} />
       </div>
+
       <div>
         <label className="block text-sm font-medium mb-1">Website</label>
         <Input name="website" value={form.website} onChange={handleChange} />
       </div>
+
       <div className="flex gap-4">
         <div className="flex-1">
-          <label className="block text-sm font-medium mb-1">Horário de abertura</label>
-          <Input type="time" name="openingTime" value={form.openingTime} onChange={handleChange} />
+          <label className="block text-sm font-medium mb-1">Horario de abertura</label>
+          <Input
+            type="time"
+            name="openingTime"
+            value={form.openingTime}
+            onChange={handleChange}
+          />
         </div>
         <div className="flex-1">
-          <label className="block text-sm font-medium mb-1">Horário de fechamento</label>
-          <Input type="time" name="closingTime" value={form.closingTime} onChange={handleChange} />
+          <label className="block text-sm font-medium mb-1">Horario de fechamento</label>
+          <Input
+            type="time"
+            name="closingTime"
+            value={form.closingTime}
+            onChange={handleChange}
+          />
         </div>
       </div>
+
       <div>
         <label className="block text-sm font-medium mb-1 mt-2">Dias de funcionamento</label>
         <div className="flex flex-wrap gap-2">
-          {diasSemana.map(dia => (
+          {DAYS_OF_WEEK.map((day) => (
             <button
               type="button"
-              key={dia.value}
-              className={`px-3 py-1 rounded border text-xs font-medium transition ${form.openDays.includes(dia.value) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-blue-700 border-blue-300'}`}
-              onClick={() => handleDayToggle(dia.value)}
+              key={day.value}
+              className={`px-3 py-1 rounded border text-xs font-medium transition ${
+                form.openDays.includes(day.value)
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-blue-700 border-blue-300"
+              }`}
+              onClick={() => handleDayToggle(day.value)}
             >
-              {dia.label}
+              {day.label}
             </button>
           ))}
         </div>
       </div>
+
       <Separator className="my-2" />
-      <Button type="submit" disabled={saving}>{saving ? "Salvando..." : "Salvar Alterações"}</Button>
-      {success && <span className="text-green-600 text-sm">Alterações salvas!</span>}
+
+      <Button type="submit" disabled={saving}>
+        {saving ? "Salvando..." : "Salvar Alteracoes"}
+      </Button>
+      {success && <span className="text-green-600 text-sm">Alteracoes salvas!</span>}
     </form>
   );
 }

@@ -33,7 +33,7 @@ export default function Header() {
             alt="Logo"
             className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-blue-300 bg-white"
           />
-          <span className="hidden sm:inline text-blue-900 font-bold">
+          <span className="font-display hidden sm:inline text-blue-900 font-bold">
             FisgaClub
           </span>
         </a>
