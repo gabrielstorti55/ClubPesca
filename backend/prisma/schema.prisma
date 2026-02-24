@@ -72,6 +72,10 @@ model Business {
   photos      Photo[]
   reviews     Review[]
 
+  openingTime String?
+  closingTime String?
+  openDays    String[]
+
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

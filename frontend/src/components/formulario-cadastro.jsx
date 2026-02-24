@@ -36,7 +36,7 @@ export function SignupForm({ className, ...props }) {
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({ name: nome, email, password: senha }),
       });
-      console.log(response)
+      console.log(response);
       if (!response.ok) {
         setMensagem("Erro ao cadastrar. Tente novamente.");
         return;
@@ -44,6 +44,7 @@ export function SignupForm({ className, ...props }) {
       setMensagem("Cadastro realizado com sucesso! Redirecionando...");
       setTimeout(() => navigate("/"), 2000);
     } catch (error) {
+      console.error(error);
       setMensagem("Erro ao conectar. Tente novamente.");
     }
   };

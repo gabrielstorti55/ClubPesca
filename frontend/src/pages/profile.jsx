@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -22,10 +23,16 @@ function TabButton({ active, onClick, children }) {
 }
 
 export function ProfileTabs() {
-  const { user } = useAuth();
+  const { user, logout} = useAuth();
   const [tab, setTab] = useState("perfil");
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate("/", { replace: true });
+  }
 
   useEffect(() => {
     async function fetchBusinesses() {
@@ -73,7 +80,8 @@ export function ProfileTabs() {
               </div>
               <h2 className="text-3xl font-extrabold text-blue-900 mb-1 tracking-tight">{user?.name}</h2>
               <p className="text-blue-700 text-base mb-6">{user?.email}</p>
-              <Button className="w-full max-w-xs transition hover:scale-105" variant="secondary">Editar Perfil</Button>
+              <Button className="w-full max-w-xs transition hover:scale-105 border-gray-400" variant="secondary">Editar Perfil</Button>
+              <Button className="w-full max-w-xs transition hover:scale-105 bg-red-600 mt-2" variant="secondary" onClick={handleLogout}>Sair</Button>
             </div>
           )}
           {tab === 'pesqueiro' && (

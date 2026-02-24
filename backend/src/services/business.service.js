@@ -12,7 +12,8 @@ export async function getAllBusinesses() {
   return await prisma.business.findMany({
     include: {
       address: true,
-      photos: true
+      photos: true,
+      type: true
     }
   });
 }
@@ -22,7 +23,8 @@ export async function getBusinessesByUserId(userId) {
     where: { ownerId: userId },
     include: {
       address: true,
-      photos: true
+      photos: true,
+      type: true
     }
   });
 }

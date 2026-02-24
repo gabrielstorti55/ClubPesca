@@ -6,7 +6,6 @@ import { Separator } from "@/components/ui/separator";
 export default function BusinessPhotosManager({ businessId }) {
   // Debug: mostrar fotos carregadas
   const [photos, setPhotos] = useState([]);
-  console.log('Fotos carregadas:', photos);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
