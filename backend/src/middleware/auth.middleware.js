@@ -1,33 +1,36 @@
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
-function authMiddleware(req, res, next) {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-        return res.status(401).json({ message: 'Voce nao esta logado' });
-    }
-
-    try {
-        const payload = jwt.verify(token, JWT_SECRET);
-        req.user = payload;
-        next();
-    } catch (err) {
-        return res.status(403).json({ message: 'Voce nao tem permissao para acessar essa pagina' });
-    }
+function extractToken(req) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return null;
+  return authHeader.split(" ")[1];
 }
 
 export function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Token não fornecido' });
+  const token = extractToken(req);
+  if (!token) return res.status(401).json({ error: "Token nao fornecido" });
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: 'Token inválido' });
+  try {
+    const user = jwt.verify(token, JWT_SECRET);
     req.userId = user.id;
-    next();
-  });
+    return next();
+  } catch (_error) {
+    return res.status(403).json({ error: "Token invalido" });
+  }
 }
 
-export default authMiddleware
+export function attachUserIfPresent(req, _res, next) {
+  const token = extractToken(req);
+  if (!token) return next();
+
+  try {
+    const user = jwt.verify(token, JWT_SECRET);
+    req.userId = user.id;
+  } catch (_error) {
+    req.userId = undefined;
+  }
+
+  return next();
+}

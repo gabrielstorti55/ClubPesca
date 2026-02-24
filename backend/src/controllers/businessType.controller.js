@@ -1,19 +1,20 @@
-import { createBusinessTypeService, getBusinessTypesService } from '../services/businessType.service.js';
+import {
+  createBusinessTypeService,
+  getBusinessTypesService,
+} from "../services/businessType.service.js";
+import { HttpError } from "../utils/http-error.js";
+import { asyncHandler } from "../utils/async-handler.js";
 
-export async function createBusinessType(req, res) {
+export const createBusinessType = asyncHandler(async (req, res) => {
   try {
     const businessType = await createBusinessTypeService(req.body);
-    res.status(201).json(businessType);
+    return res.status(201).json(businessType);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    throw new HttpError(400, error.message);
   }
-}
+});
 
-export async function getBusinessTypes(req, res) {
-  try {
-    const businessTypes = await getBusinessTypesService();
-    res.json(businessTypes);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
+export const getBusinessTypes = asyncHandler(async (_req, res) => {
+  const businessTypes = await getBusinessTypesService();
+  return res.json(businessTypes);
+});

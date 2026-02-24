@@ -1,41 +1,38 @@
-import { createBusiness, getAllBusinesses, updateBusinesses, getBusinessesByUserId } from "../services/business.service.js"
+import {
+  createBusiness,
+  getAllBusinesses,
+  getBusinessesByUserId,
+  updateBusinesses,
+} from "../services/business.service.js";
+import { HttpError } from "../utils/http-error.js";
+import { asyncHandler } from "../utils/async-handler.js";
 
-export async function create(req, res) {
+export const create = asyncHandler(async (req, res) => {
   try {
-    const data = {
+    const business = await createBusiness({
       ...req.body,
-      ownerId: req.userId 
-    };
-    const business = await createBusiness(data);
-    return res.status(201).json(business);
-  } catch (err) {
-    return res.status(400).json({
-      error: err.message
+      ownerId: req.userId,
     });
+
+    return res.status(201).json(business);
+  } catch (error) {
+    throw new HttpError(400, error.message);
   }
-}
+});
 
+export const getAll = asyncHandler(async (req, res) => {
+  const businesses = req.userId
+    ? await getBusinessesByUserId(req.userId)
+    : await getAllBusinesses();
 
-export async function getAll(req, res) {
+  return res.json(businesses);
+});
+
+export const update = asyncHandler(async (req, res) => {
   try {
-    // Se o usuário está autenticado, retorna só os pesqueiros dele
-    if (req.userId) {
-      const businesses = await getBusinessesByUserId(req.userId);
-      return res.json(businesses);
-    }
-    // Caso contrário, retorna todos
-    const businesses = await getAllBusinesses();
-    return res.json(businesses);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+    const updatedBusiness = await updateBusinesses(req.params.id, req.body);
+    return res.json(updatedBusiness);
+  } catch (error) {
+    throw new HttpError(400, error.message);
   }
-}
-
-export async function update(req, res) {
-  try {
-    const updated = await updateBusinesses(req.params.id, req.body);
-    return res.json(updated);
-  } catch (err) {
-    return res.status(400).json({ error: err.message });
-  }
-}
+});

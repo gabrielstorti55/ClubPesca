@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client"
-
-const prisma = new PrismaClient()
+import { prisma } from "../lib/prisma.js"
 
 // Cria uma nova foto para o pesqueiro
 export async function uploadPhoto({ url, businessId }) {

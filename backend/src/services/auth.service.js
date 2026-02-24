@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client'
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import { prisma } from '../lib/prisma.js';
 
-const prisma = new PrismaClient()
 const JWT_SECRET = process.env.JWT_SECRET
 
 export async function registerUser(data) {

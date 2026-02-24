@@ -1,37 +1,34 @@
+import {
+  createAddressService,
+  getAddressByIdService,
+  getAddressesService,
+} from "../services/address.service.js";
+import { HttpError } from "../utils/http-error.js";
+import { asyncHandler } from "../utils/async-handler.js";
 
-import { createAddressService, getAddressesService, getAddressByIdService } from '../services/address.service.js';
-
-export async function createAddress(req, res) {
+export const createAddress = asyncHandler(async (req, res) => {
   try {
-    // Vincula o endereço ao usuário logado
-    const data = {
+    const address = await createAddressService({
       ...req.body,
-      userId: req.userId // userId vem do authenticateToken
-    };
-    const address = await createAddressService(data);
-    res.status(201).json(address);
+      userId: req.userId,
+    });
+
+    return res.status(201).json(address);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    throw new HttpError(400, error.message);
   }
-}
+});
 
+export const getAddresses = asyncHandler(async (_req, res) => {
+  const addresses = await getAddressesService();
+  return res.json(addresses);
+});
 
-export async function getAddresses(req, res) {
-  try {
-    const addresses = await getAddressesService();
-    res.json(addresses);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+export const getAddressById = asyncHandler(async (req, res) => {
+  const address = await getAddressByIdService(req.params.id);
+  if (!address) {
+    throw new HttpError(404, "Endereco nao encontrado");
   }
-}
 
-
-export async function getAddressById(req, res) {
-  try {
-    const address = await getAddressByIdService(req.params.id);
-    if (!address) return res.status(404).json({ error: 'Endereço não encontrado' });
-    res.json(address);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
+  return res.json(address);
+});

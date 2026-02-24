@@ -1,40 +1,29 @@
-import { uploadPhoto, listPhotos, deletePhoto } from "../services/photo.service.js";
+import { deletePhoto, listPhotos, uploadPhoto } from "../services/photo.service.js";
+import { HttpError } from "../utils/http-error.js";
+import { asyncHandler } from "../utils/async-handler.js";
 
-export async function createPhoto(req, res) {
-    try {
-        const { businessId } = req.body;
-        let url = req.body.url;
-        if (req.file) {
-            // Usa o buffer do multer em memória
-            url = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
-        }
-        const photo = await uploadPhoto({ url, businessId });
-        res.status(201).json(photo);
-    } catch (error) {
-        res.status(500).json({ error: "Erro ao criar foto", details: error.message });
-    }
-}
+export const createPhoto = asyncHandler(async (req, res) => {
+  const { businessId } = req.body;
+  let url = req.body.url;
 
-// Lista todas as fotos de um pesqueiro
-export async function getPhotos(req, res) {
-    try {
-        const { businessId } = req.params;
-        const photos = await listPhotos(businessId);
-        res.json(photos);
-    } catch (error) {
-        res.status(500).json({ error: "Erro ao listar fotos", details: error.message });
-    }
-}
+  if (req.file) {
+    url = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+  }
 
-// Função de foto principal removida pois não é mais necessária
+  if (!url || !businessId) {
+    throw new HttpError(400, "Dados obrigatorios da foto nao informados");
+  }
 
-// Deleta uma foto
-export async function removePhoto(req, res) {
-    try {
-        const { photoId } = req.params;
-        await deletePhoto(photoId);
-        res.status(204).send();
-    } catch (error) {
-        res.status(500).json({ error: "Erro ao deletar foto", details: error.message });
-    }
-}
+  const photo = await uploadPhoto({ url, businessId });
+  return res.status(201).json(photo);
+});
+
+export const getPhotos = asyncHandler(async (req, res) => {
+  const photos = await listPhotos(req.params.businessId);
+  return res.json(photos);
+});
+
+export const removePhoto = asyncHandler(async (req, res) => {
+  await deletePhoto(req.params.photoId);
+  return res.status(204).send();
+});
