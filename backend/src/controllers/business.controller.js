@@ -3,6 +3,7 @@ import {
   getAllBusinesses,
   getBusinessesByUserId,
   updateBusinesses,
+  deleteBusinesses,
 } from "../services/business.service.js";
 import { HttpError } from "../utils/http-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
@@ -32,6 +33,15 @@ export const update = asyncHandler(async (req, res) => {
   try {
     const updatedBusiness = await updateBusinesses(req.params.id, req.body);
     return res.json(updatedBusiness);
+  } catch (error) {
+    throw new HttpError(400, error.message);
+  }
+});
+
+export const deleteBusiness = asyncHandler(async (req, res) => {
+  try {
+    await deleteBusinesses(req.params.id);
+    return res.status(204).send();
   } catch (error) {
     throw new HttpError(400, error.message);
   }

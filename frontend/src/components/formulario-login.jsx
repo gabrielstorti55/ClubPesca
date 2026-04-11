@@ -51,7 +51,7 @@ export function LoginForm({ className, ...props }) {
 
       console.log("Login realizado:", data);
 
-      navigate("/home");
+      navigate("/");
       window.location.reload();
     } catch (error) {
       alert("Erro ao conectar. Tente novamente.");

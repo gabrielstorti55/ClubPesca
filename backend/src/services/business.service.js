@@ -12,7 +12,16 @@ export async function getAllBusinesses() {
     include: {
       address: true,
       photos: true,
-      type: true
+      type: true,
+      offers: {
+        where: { active: true },
+        orderBy: { createdAt: "desc" },
+      },
+      fishes: {
+        include: {
+          fish: true,
+        },
+      },
     }
   });
 }
@@ -23,7 +32,15 @@ export async function getBusinessesByUserId(userId) {
     include: {
       address: true,
       photos: true,
-      type: true
+      type: true,
+      offers: {
+        orderBy: { createdAt: "desc" },
+      },
+      fishes: {
+        include: {
+          fish: true,
+        },
+      },
     }
   });
 }

@@ -10,9 +10,9 @@ export default function App() {
     <AuthProvider>
       <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
         <Routes>
-          <Route path="/" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/cadastro" element={<SignupPage />} />
-          <Route path="/home" element={<HomePage />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/profile" element={<ProfileTabs />} />
         </Routes>
       </div>

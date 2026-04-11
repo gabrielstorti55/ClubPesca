@@ -28,6 +28,7 @@ export default function BusinessEditForm({ business, onSave }) {
       name: business.name || "",
       description: business.description || "",
       phone: business.phone || "",
+      whatsapp: business.whatsapp || "",
       website: business.website || "",
       openingTime: business.openingTime || "",
       closingTime: business.closingTime || "",
@@ -101,6 +102,16 @@ export default function BusinessEditForm({ business, onSave }) {
       <div>
         <label className="block text-sm font-medium mb-1">Telefone</label>
         <Input name="phone" value={form.phone} onChange={handleChange} />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">WhatsApp</label>
+        <Input
+          name="whatsapp"
+          value={form.whatsapp}
+          onChange={handleChange}
+          placeholder="(11) 99999-9999"
+        />
       </div>
 
       <div>

@@ -27,7 +27,7 @@ export default function Header() {
   return (
     <header className="fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-1rem)] sm:w-[95vw] max-w-5xl rounded-2xl bg-white/85 backdrop-blur-md shadow-lg border border-blue-200">
       <div className="flex items-center justify-between gap-2 px-3 py-2 sm:px-4 lg:px-6">
-        <a className="flex items-center gap-2" href="/home">
+        <a className="flex items-center gap-2" href="/">
           <img
             src="/Logo-transparente.png"
             alt="Logo"
@@ -53,7 +53,7 @@ export default function Header() {
           ) : (
             <>
               <Button variant="outline" asChild>
-                <a href="/">Entrar</a>
+                <a href="/login">Entrar</a>
               </Button>
               <Button asChild>
                 <a href="/cadastro">Cadastre-se</a>
@@ -105,7 +105,7 @@ export default function Header() {
                 ) : (
                   <>
                     <Button variant="outline" asChild className="w-full">
-                      <a href="/" onClick={() => setOpenMenu(false)}>
+                      <a href="/login" onClick={() => setOpenMenu(false)}>
                         Entrar
                       </a>
                     </Button>

@@ -43,7 +43,7 @@ export function SignupForm({ className, ...props }) {
         return;
       }
       setMensagem("Cadastro realizado com sucesso! Redirecionando...");
-      setTimeout(() => navigate("/"), 2000);
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
       console.error(error);
       setMensagem("Erro ao conectar. Tente novamente.");
@@ -122,7 +122,7 @@ export function SignupForm({ className, ...props }) {
         )}
         <Field>
           <FieldDescription className="px-6 text-center">
-            Já tem uma conta? <a href="/">Entrar</a>
+            Já tem uma conta? <a href="/login">Entrar</a>
           </FieldDescription>
         </Field>
       </FieldGroup>
