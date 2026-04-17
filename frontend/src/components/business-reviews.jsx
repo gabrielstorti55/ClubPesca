@@ -26,7 +26,7 @@ function StarSelector({ rating, onSelect }) {
   );
 }
 
-export default function BusinessReviews({ businessId, isOpen, onClose }) {
+export default function BusinessReviews({ businessId, onClose }) {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(0);
@@ -38,10 +38,9 @@ export default function BusinessReviews({ businessId, isOpen, onClose }) {
   const isLoggedIn = !!localStorage.getItem("token");
 
   useEffect(() => {
-    if (isOpen) {
-      loadReviews();
-    }
-  }, [isOpen, businessId]);
+    loadReviews();
+    // eslint-disable-next-line
+  }, [businessId]);
 
   async function loadReviews() {
     setLoading(true);
@@ -118,7 +117,7 @@ export default function BusinessReviews({ businessId, isOpen, onClose }) {
     }
   }
 
-  if (!isOpen) return null;
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

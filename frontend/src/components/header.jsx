@@ -8,11 +8,11 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/sheet";
 const links = [
   {
     label: "Destinos",
-    href: "#destinos",
+    href: "/",
   },
   {
     label: "Dicas",
-    href: "#dicas",
+    href: "/dicas",
   },
   {
     label: "Sobre",
