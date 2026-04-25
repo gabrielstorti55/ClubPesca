@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { assetUrl } from "@/lib/api";
+import { ESTADOS_IBGE } from "@/lib/estados-ibge";
 import BusinessRating from "@/components/business-rating";
 import BusinessReviews from "@/components/business-reviews";
 
@@ -34,8 +35,13 @@ export function PesqueiroCard({ pesqueiro }) {
         pesqueiro.address.street &&
         pesqueiro.address.city ? (
           <div className="text-sm text-muted-foreground mt-2">
-            Endereco: {pesqueiro.address.street}, {pesqueiro.address.number} -{" "}
-            {pesqueiro.address.city}, {pesqueiro.address.state}
+            Endereco: {pesqueiro.address.street}, {pesqueiro.address.number} - {pesqueiro.address.city}, {
+              // Mostrar sigla se for id, senão mostrar valor direto
+              (function() {
+                const estado = ESTADOS_IBGE.find(e => e.id == pesqueiro.address.state || e.sigla === pesqueiro.address.state);
+                return estado ? estado.sigla : pesqueiro.address.state;
+              })()
+            }
           </div>
         ) : (
           <div className="text-sm text-muted-foreground mt-2">

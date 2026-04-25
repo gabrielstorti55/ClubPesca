@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { apiUrl } from "@/lib/api";
+import EstadoCidadeSelect from "@/components/estado-cidade-select";
 
 const DAYS_OF_WEEK = [
   { label: "Dom", value: "domingo" },
@@ -198,20 +199,15 @@ export default function BusinessCreateForm({ onSave, onCancel }) {
           <Input name="zipCode" value={form.zipCode} onChange={handleChange} required />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Cidade *</label>
-          <Input name="city" value={form.city} onChange={handleChange} required />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Estado *</label>
-          <Input
-            name="state"
-            value={form.state}
-            onChange={handleChange}
-            required
-            maxLength={2}
-            placeholder="SP"
+        <div className="col-span-2">
+          <EstadoCidadeSelect
+            onChange={({ estado, cidade }) => {
+              setForm((prev) => ({
+                ...prev,
+                state: estado,
+                city: cidade,
+              }));
+            }}
           />
         </div>
       </div>

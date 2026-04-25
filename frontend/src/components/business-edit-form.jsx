@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { apiUrl } from "@/lib/api";
+import EstadoCidadeSelect from "@/components/estado-cidade-select";
 
 const DAYS_OF_WEEK = [
   { label: "Dom", value: "domingo" },
@@ -33,16 +34,39 @@ export default function BusinessEditForm({ business, onSave }) {
       openingTime: business.openingTime || "",
       closingTime: business.closingTime || "",
       openDays: business.openDays || [],
+      typeId: business.typeId || "",
+      street: business.address?.street || "",
+      number: business.address?.number || "",
+      zipCode: business.address?.zipCode || "",
+      city: business.address?.city || "",
+      state: business.address?.state || "",
     }),
     [business]
   );
 
   const [form, setForm] = useState(initialForm);
+  const [types, setTypes] = useState([]);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => {
+    async function fetchTypes() {
+      try {
+        const response = await fetch(apiUrl("/businessType"));
+        if (response.ok) {
+          const data = await response.json();
+          setTypes(data);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar tipos:", err);
+      }
+    }
+    fetchTypes();
+  }, []);
+
   function handleChange(e) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const value = e.target.type === "number" ? parseInt(e.target.value) : e.target.value;
+    setForm((prev) => ({ ...prev, [e.target.name]: value }));
   }
 
   function handleDayToggle(day) {
@@ -85,12 +109,12 @@ export default function BusinessEditForm({ business, onSave }) {
   return (
     <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
       <div>
-        <label className="block text-sm font-medium mb-1">Nome do Pesqueiro</label>
+        <label className="block text-sm font-medium mb-1">Nome do Pesqueiro *</label>
         <Input name="name" value={form.name} onChange={handleChange} required />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Descricao</label>
+        <label className="block text-sm font-medium mb-1">Descricao *</label>
         <Input
           name="description"
           value={form.description}
@@ -98,6 +122,67 @@ export default function BusinessEditForm({ business, onSave }) {
           required
         />
       </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Tipo de Negocio *</label>
+        <select
+          name="typeId"
+          value={form.typeId}
+          onChange={handleChange}
+          required
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+        >
+          <option value="">Selecione um tipo</option>
+          {types.map((type) => (
+            <option key={type.id} value={type.id}>
+              {type.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <Separator />
+      <h4 className="text-md font-semibold text-blue-900">Endereco</h4>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="col-span-2">
+          <label className="block text-sm font-medium mb-1">Rua *</label>
+          <Input name="street" value={form.street} onChange={handleChange} required />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Numero *</label>
+          <Input
+            type="number"
+            name="number"
+            value={form.number}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">CEP *</label>
+          <Input name="zipCode" value={form.zipCode} onChange={handleChange} required />
+        </div>
+
+        <div className="col-span-2">
+          <EstadoCidadeSelect
+            onChange={({ estado, cidade }) => {
+              setForm((prev) => ({
+                ...prev,
+                state: estado,
+                city: cidade,
+              }));
+            }}
+            initialEstado={form.state}
+            initialCidade={form.city}
+          />
+        </div>
+      </div>
+
+      <Separator />
+      <h4 className="text-md font-semibold text-blue-900">Contato</h4>
 
       <div>
         <label className="block text-sm font-medium mb-1">Telefone</label>
@@ -119,9 +204,12 @@ export default function BusinessEditForm({ business, onSave }) {
         <Input name="website" value={form.website} onChange={handleChange} />
       </div>
 
+      <Separator />
+      <h4 className="text-md font-semibold text-blue-900">Horario de Funcionamento</h4>
+
       <div className="flex gap-4">
         <div className="flex-1">
-          <label className="block text-sm font-medium mb-1">Horario de abertura</label>
+          <label className="block text-sm font-medium mb-1">Abertura</label>
           <Input
             type="time"
             name="openingTime"
@@ -130,7 +218,7 @@ export default function BusinessEditForm({ business, onSave }) {
           />
         </div>
         <div className="flex-1">
-          <label className="block text-sm font-medium mb-1">Horario de fechamento</label>
+          <label className="block text-sm font-medium mb-1">Fechamento</label>
           <Input
             type="time"
             name="closingTime"
