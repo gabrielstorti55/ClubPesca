@@ -5,12 +5,12 @@ import { useBusinessFilters } from "@/hooks/use-business-filters";
 
 const dicas = [
   {
-    titulo: "Como escolher a isca ideal?",
-    texto: "Veja dicas para aumentar suas chances de sucesso na pescaria.",
+    titulo: "Escolha a isca certa",
+    texto: "Aumente suas chances de sucesso com as melhores iscas para cada situação.",
   },
   {
-    titulo: "Equipamentos recomendados",
-    texto: "Conheca os melhores equipamentos para cada tipo de peixe.",
+    titulo: "Equipamento ideal",
+    texto: "Descubra qual equipamento usar para cada tipo de peixe e torne sua pescaria mais eficiente.",
   },
 ];
 
@@ -47,7 +47,7 @@ export default function Home() {
             FisgaClub
           </h1>
           <p className="text-2xl md:text-3xl text-white mb-6 drop-shadow">
-            Descubra os melhores destinos de pesca esportiva
+            Encontre os melhores lugares de lazer e pesca perto de você
           </p>
         </div>
       </section>
@@ -74,7 +74,7 @@ export default function Home() {
           ))}
           {businessFiltrados.length === 0 && (
             <div className="w-full text-center py-10 text-blue-900 font-medium">
-              Nenhum pesqueiro encontrado com os filtros selecionados.
+              Não encontramos pesqueiros com os filtros escolhidos. Tente ajustar sua busca!
             </div>
           )}
         </div>
@@ -82,7 +82,7 @@ export default function Home() {
 
       <section className="py-10 px-4 max-w-7xl mx-auto w-full">
         <h2 className="font-display text-2xl font-bold text-blue-900 mb-6 text-center">
-          Dicas & Novidades
+          Dicas para sua pescaria
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {dicas.map((dica, idx) => (
@@ -102,7 +102,7 @@ export default function Home() {
       <footer className="bg-blue-900 text-white py-8 mt-auto w-full">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-4">
           <span className="text-lg">
-            &copy; 2026 FisgaClub. Todos os direitos reservados.
+            &copy; 2026 FisgaClub. Sua comunidade de pesca.
           </span>
           <div className="flex gap-6 mt-4 md:mt-0">
             <a href="#" className="hover:underline text-white text-lg">
@@ -112,7 +112,7 @@ export default function Home() {
               Facebook
             </a>
             <a href="#" className="hover:underline text-white text-lg">
-              Contato
+              Fale conosco
             </a>
           </div>
         </div>
