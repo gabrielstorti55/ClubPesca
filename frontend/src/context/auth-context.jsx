@@ -24,6 +24,8 @@ export function AuthProvider({ children }) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache"
       },
     })
       .then((res) => {
@@ -32,6 +34,7 @@ export function AuthProvider({ children }) {
       })
       .then((data) => {
         if (!active) return;
+        console.log("Dados do usuário logado:", data); // DEBUG
         setUser(data);
         setLoading(false);
       })

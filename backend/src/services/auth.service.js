@@ -55,6 +55,7 @@ export async function loginUser({email, password}) {
         id: foundEmail.id,
         name: foundEmail.name,
         email: foundEmail.email,
+        role: foundEmail.role,
         token
     }
 }

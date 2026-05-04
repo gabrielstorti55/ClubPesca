@@ -15,11 +15,18 @@ datasource db {
 // USER ok
 // ==============================
 
+enum Role {
+  USER
+  OWNER
+  ADMIN
+}
+
 model User {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   name      String
   password  String
+  role      Role     @default(USER)
 
   businesses Business[] @relation("UserBusinesses")
   reviews    Review[]

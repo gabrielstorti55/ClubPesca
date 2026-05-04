@@ -5,11 +5,17 @@ import {
   updateBusinesses,
   deleteBusinesses,
 } from "../services/business.service.js";
+import { getUserById } from "../services/auth.service.js";
 import { HttpError } from "../utils/http-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
 
 export const create = asyncHandler(async (req, res) => {
   try {
+    const user = await getUserById(req.userId);
+    if (!user || (user.role !== 'OWNER' && user.role !== 'ADMIN')) {
+      throw new HttpError(403, "Apenas usuários com o título de dono ou administrador podem criar um pesqueiro.");
+    }
+
     const business = await createBusiness({
       ...req.body,
       ownerId: req.userId,

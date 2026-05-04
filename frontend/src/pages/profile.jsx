@@ -35,15 +35,18 @@ export function ProfileTabs() {
                 Meu Perfil
               </span>
             </ProfileTabButton>
-            <ProfileTabButton
-              active={tab === "pesqueiro"}
-              onClick={() => setTab("pesqueiro")}
-            >
-              <span className="flex items-center gap-2">
-                <PhishingIcon />
-                Meus Pesqueiros
-              </span>
-            </ProfileTabButton>
+            
+            {(user?.role === "OWNER" || user?.role === "ADMIN") && (
+              <ProfileTabButton
+                active={tab === "pesqueiro"}
+                onClick={() => setTab("pesqueiro")}
+              >
+                <span className="flex items-center gap-2">
+                  <PhishingIcon />
+                  Meus Pesqueiros
+                </span>
+              </ProfileTabButton>
+            )}
           </div>
 
           <Separator className="mb-8 w-full" />
