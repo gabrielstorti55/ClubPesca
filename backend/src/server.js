@@ -15,7 +15,26 @@ import cors from 'cors'
 const app = express()
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Origens permitidas a chamar essa API.
+// FRONTEND_URL vem do .env (ex: https://fisga-club.vercel.app) e cobre produção.
+// As demais cobrem desenvolvimento local com Vite.
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+].filter(Boolean);
+
+const corsOptions = {
+  origin(origin, callback) {
+    // Requisições sem "origin" (ex: Postman, curl, apps mobile) são permitidas.
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Bloqueado pelo CORS: origem não autorizada.'));
+  },
+};
+
+app.use(cors(corsOptions));
 app.use(express.json())
 app.use('/uploads/photos', express.static('uploads/photos'));
 app.use('/auth', authRoutes)
