@@ -170,6 +170,7 @@ model Photo {
   id         String @id @default(auto()) @map("_id") @db.ObjectId
 
   url        String
+  publicId   String? // id da imagem no Cloudinary, usado para deletar o arquivo lá
 
   isMain     Boolean @default(false)
   order      Int?

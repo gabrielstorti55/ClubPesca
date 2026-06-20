@@ -11,7 +11,9 @@ export async function getAllBusinesses() {
   return await prisma.business.findMany({
     include: {
       address: true,
-      photos: true,
+      photos: {
+        orderBy: [{ isMain: "desc" }, { order: "asc" }],
+      },
       type: true,
       offers: {
         where: { active: true },
@@ -31,7 +33,9 @@ export async function getBusinessesByUserId(userId) {
     where: { ownerId: userId },
     include: {
       address: true,
-      photos: true,
+      photos: {
+        orderBy: [{ isMain: "desc" }, { order: "asc" }],
+      },
       type: true,
       offers: {
         orderBy: { createdAt: "desc" },

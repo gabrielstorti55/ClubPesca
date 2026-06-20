@@ -1,81 +1,93 @@
-import { useEffect, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
-import { apiUrl, assetUrl } from "@/lib/api";
+import { apiUrl, assetUrl, authFetch } from "@/lib/api";
 
-function getLatestPhoto(photos) {
-  if (!Array.isArray(photos) || photos.length === 0) {
-    return null;
-  }
-
-  if (photos.length === 1) {
-    return photos[0];
-  }
-
-  const ordered = [...photos].sort((a, b) => {
-    if (a.createdAt && b.createdAt) {
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    }
-
-    return (b.id || 0) - (a.id || 0);
-  });
-
-  return ordered[0] || null;
-}
+const MAX_PHOTOS = 8;
 
 export default function BusinessPhotosManager({ businessId }) {
   const [photos, setPhotos] = useState([]);
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const selectedPhoto = useMemo(() => photos[0] || null, [photos]);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!businessId) return;
-
-    fetch(apiUrl(`/photo/photos/${businessId}`))
-      .then((res) => res.json())
-      .then((fotos) => {
-        const latestPhoto = getLatestPhoto(fotos);
-        setPhotos(latestPhoto ? [latestPhoto] : []);
-      });
+    loadPhotos();
   }, [businessId]);
 
-  async function handleUpload() {
+  async function loadPhotos() {
+    setLoading(true);
+    try {
+      const res = await fetch(apiUrl(`/photo/photos/${businessId}`));
+      const data = await res.json();
+      setPhotos(Array.isArray(data) ? data : []);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleFileSelect(e) {
+    const file = e.target.files[0];
+    e.target.value = "";
     if (!file) return;
 
-    setLoading(true);
-    const token = localStorage.getItem("token");
+    if (photos.length >= MAX_PHOTOS) {
+      setError(`Limite de ${MAX_PHOTOS} fotos por pesqueiro atingido.`);
+      return;
+    }
+
+    setError("");
+    setUploading(true);
+
     const formData = new FormData();
     formData.append("photo", file);
     formData.append("businessId", businessId);
 
-    const res = await fetch(apiUrl("/photo/photos"), {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
+    try {
+      const res = await authFetch("/photo/photos", {
+        method: "POST",
+        body: formData,
+      });
 
-    if (res.ok) {
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Não foi possível enviar a foto.");
+      }
+
       const novaFoto = await res.json();
-      setFile(null);
-      setPreview("");
-      setPhotos([novaFoto]);
+      setPhotos((prev) => [...prev, novaFoto]);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploading(false);
     }
-
-    setLoading(false);
   }
 
-  function handleClearImage() {
-    setFile(null);
-    setPreview("");
-    setPhotos([]);
+  async function handleSetMain(photoId) {
+    setError("");
+    try {
+      const res = await authFetch(`/photo/photos/${photoId}/main`, { method: "PATCH" });
+      if (!res.ok) throw new Error("Não foi possível definir a foto principal.");
+      await loadPhotos();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  async function handleRemove(photoId) {
+    setError("");
+    try {
+      const res = await authFetch(`/photo/photos/${photoId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Não foi possível remover a foto.");
+      setPhotos((prev) => prev.filter((p) => p.id !== photoId));
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   return (
     <div className="w-full mt-8">
-      <h3 className="text-2xl font-bold mb-6 text-blue-900 tracking-tight flex items-center gap-2">
+      <h3 className="text-2xl font-bold mb-2 text-blue-900 tracking-tight flex items-center gap-2">
         <svg
           className="w-6 h-6 text-blue-600"
           fill="none"
@@ -91,83 +103,96 @@ export default function BusinessPhotosManager({ businessId }) {
         </svg>
         Fotos do Pesqueiro
       </h3>
+      <p className="text-sm text-blue-700/70 mb-6">
+        {photos.length}/{MAX_PHOTOS} fotos · a foto com estrela é a principal, exibida nos cards
+      </p>
 
       <Separator className="my-8" />
 
-      {loading && (
-        <div className="text-blue-700 text-lg py-8 text-center">Carregando fotos...</div>
+      {error && (
+        <div className="mb-6 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+          {error}
+        </div>
       )}
 
-      <div className="flex justify-center">
-        <div className="relative w-48 h-48 flex items-center justify-center border-2 border-blue-200 rounded-2xl bg-white/80 shadow-xl backdrop-blur-xl transition-all duration-200">
-          {selectedPhoto?.url ? (
-            <>
+      {loading ? (
+        <div className="text-blue-700 text-lg py-8 text-center">Carregando fotos...</div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {photos.map((photo) => (
+            <div
+              key={photo.id}
+              className="relative aspect-square rounded-2xl overflow-hidden border-2 border-blue-200 bg-white/80 shadow group"
+            >
               <img
-                src={assetUrl(selectedPhoto.url)}
-                alt="Logo do Pesqueiro"
-                className="w-full h-full object-cover rounded-2xl"
-                style={{ boxShadow: "0 0 0 4px #2563eb33" }}
+                src={assetUrl(photo.url)}
+                alt="Foto do pesqueiro"
+                className="w-full h-full object-cover"
               />
-              <button
-                type="button"
-                onClick={handleClearImage}
-                className="absolute top-2 right-2 bg-white/80 hover:bg-blue-600 hover:text-white text-blue-600 rounded-full p-1 shadow transition z-10 border border-blue-100"
-                title="Alterar logo"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
+
+              {photo.isMain && (
+                <div
+                  className="absolute top-2 left-2 bg-yellow-400 text-white rounded-full p-1 shadow"
+                  title="Foto principal"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.232 5.232l3.536 3.536M9 11l6 6M3 17v4h4l11-11a2.828 2.828 0 10-4-4L3 17z"
-                  />
-                </svg>
-              </button>
-            </>
-          ) : preview ? (
-            <>
-              <img
-                src={preview}
-                alt="Preview"
-                className="w-full h-full object-cover rounded-2xl animate-fade-in"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  setFile(null);
-                  setPreview("");
-                }}
-                className="absolute top-2 right-2 bg-white/80 hover:bg-red-500 hover:text-white text-red-500 rounded-full p-1 shadow transition z-10 border border-red-100"
-                title="Remover preview"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.922-.755 1.688-1.538 1.118l-3.37-2.448a1 1 0 00-1.176 0l-3.37 2.448c-.783.57-1.838-.196-1.539-1.118l1.287-3.957a1 1 0 00-.363-1.118l-3.371-2.448c-.783-.57-.38-1.81.588-1.81h4.163a1 1 0 00.95-.69l1.285-3.957z" />
+                  </svg>
+                </div>
+              )}
+
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                {!photo.isMain && (
+                  <button
+                    type="button"
+                    onClick={() => handleSetMain(photo.id)}
+                    className="bg-white/90 hover:bg-yellow-400 hover:text-white text-yellow-600 rounded-full p-2 shadow"
+                    title="Definir como principal"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.922-.755 1.688-1.538 1.118l-3.37-2.448a1 1 0 00-1.176 0l-3.37 2.448c-.783.57-1.838-.196-1.539-1.118l1.287-3.957a1 1 0 00-.363-1.118l-3.371-2.448c-.783-.57-.38-1.81.588-1.81h4.163a1 1 0 00.95-.69l1.285-3.957z" />
+                    </svg>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleRemove(photo.id)}
+                  className="bg-white/90 hover:bg-red-500 hover:text-white text-red-500 rounded-full p-2 shadow"
+                  title="Remover foto"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-              <Button
-                type="button"
-                onClick={handleUpload}
-                disabled={loading || !file}
-                className="absolute bottom-4 left-1/2 -translate-x-1/2 w-24 rounded-xl font-semibold bg-blue-600 text-white hover:bg-blue-700 transition shadow-lg z-10"
-              >
-                <span className="flex items-center gap-2 justify-center">
                   <svg
-                    className="w-5 h-5"
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {photos.length < MAX_PHOTOS && (
+            <label className="aspect-square flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-blue-300 bg-white/60 cursor-pointer hover:bg-blue-50 transition group">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleFileSelect}
+                disabled={uploading}
+                className="hidden"
+              />
+              {uploading ? (
+                <span className="text-blue-500 text-sm">Enviando...</span>
+              ) : (
+                <>
+                  <svg
+                    className="w-8 h-8 text-blue-300 group-hover:text-blue-500 mb-1"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
@@ -175,36 +200,13 @@ export default function BusinessPhotosManager({ businessId }) {
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
-                  Salvar
-                </span>
-              </Button>
-            </>
-          ) : (
-            <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer group">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const selectedFile = e.target.files[0];
-                  setFile(selectedFile);
-                  setPreview(selectedFile ? URL.createObjectURL(selectedFile) : "");
-                }}
-                className="hidden"
-              />
-              <svg
-                className="w-12 h-12 text-blue-300 group-hover:text-blue-500 mb-2"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-              <span className="text-blue-400 text-sm">Adicionar logo</span>
+                  <span className="text-blue-400 text-sm">Adicionar foto</span>
+                </>
+              )}
             </label>
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
