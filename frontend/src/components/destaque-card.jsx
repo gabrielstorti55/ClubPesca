@@ -15,18 +15,59 @@ import BusinessReviews from "@/components/business-reviews";
 
 export function PesqueiroCard({ pesqueiro }) {
   const [showReviews, setShowReviews] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+
+  const photos = pesqueiro.photos && pesqueiro.photos.length > 0 ? pesqueiro.photos : [];
+  const hasMultiplePhotos = photos.length > 1;
+
+  function goToPrevPhoto(e) {
+    e.stopPropagation();
+    setPhotoIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
+  }
+
+  function goToNextPhoto(e) {
+    e.stopPropagation();
+    setPhotoIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
+  }
+
   return (
     <Card className="relative mx-4 mt-9 w-full max-w-sm pt-0 rounded-2xl border bg-card">
-      <div className="absolute inset-0 z-30 aspect-video bg-black/35 rounded-t-2xl" />
+      <div className="absolute inset-0 z-30 aspect-video bg-black/35 rounded-t-2xl pointer-events-none" />
       <img
         src={
-          pesqueiro.photos && pesqueiro.photos.length > 0
-            ? assetUrl(pesqueiro.photos[0].url)
+          photos.length > 0
+            ? assetUrl(photos[photoIndex].url)
             : "https://avatar.vercel.sh/shadcn1"
         }
         alt="Foto do pesqueiro"
         className="relative z-20 aspect-video w-full object-cover rounded-t-2xl"
       />
+
+      {hasMultiplePhotos && (
+        <>
+          <button
+            type="button"
+            onClick={goToPrevPhoto}
+            className="absolute left-2 top-[88px] -translate-y-1/2 z-40 bg-black/40 hover:bg-black/60 text-white rounded-full p-1.5 transition"
+            aria-label="Foto anterior"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={goToNextPhoto}
+            className="absolute right-2 top-[88px] -translate-y-1/2 z-40 bg-black/40 hover:bg-black/60 text-white rounded-full p-1.5 transition"
+            aria-label="Próxima foto"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </>
+      )}
+
       <CardHeader>
         <CardTitle>{pesqueiro.name}</CardTitle>
         <BusinessRating businessId={pesqueiro.id} />
